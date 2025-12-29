@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>avro-schemas</artifactId>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>

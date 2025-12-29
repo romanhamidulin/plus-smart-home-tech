@@ -12,6 +12,7 @@ import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hub.scenario.DeviceAction;
 import ru.yandex.practicum.telemetry.collector.model.hub.scenario.ScenarioAddedEvent;
+import ru.yandex.practicum.telemetry.collector.model.hub.scenario.ScenarioCondition;
 
 @Component
 public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAddedEventAvro> {

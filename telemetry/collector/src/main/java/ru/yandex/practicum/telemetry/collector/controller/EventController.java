@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@Validated
 @RequestMapping(path = "/events", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class EventController {
     private final Map<SensorEventType, SensorEventHandler> sensorEventHandlers;

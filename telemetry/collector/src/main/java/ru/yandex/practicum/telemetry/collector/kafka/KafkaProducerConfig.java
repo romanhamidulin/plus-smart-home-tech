@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.Properties;
 
 @Configuration
@@ -42,7 +43,7 @@ public class KafkaProducerConfig {
             public void stop() {
                 if (producer != null) {
                     producer.flush();
-                    producer.close();
+                    producer.close(Duration.ofSeconds(30));
                 }
             }
         };

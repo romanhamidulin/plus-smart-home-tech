@@ -8,8 +8,8 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import serializer.GeneralAvroSerializer;
 
-import java.time.Duration;
 import java.util.Properties;
 
 @Configuration
@@ -43,7 +43,7 @@ public class KafkaProducerConfig {
             public void stop() {
                 if (producer != null) {
                     producer.flush();
-                    producer.close(Duration.ofSeconds(30));
+                    producer.close();
                 }
             }
         };

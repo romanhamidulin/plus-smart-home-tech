@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @GrpcService
-public class EventController extends CollectorControllerGrpc.CollectorControllerImplBase {
+public class CollectorController extends CollectorControllerGrpc.CollectorControllerImplBase {
     private final Map<SensorEventProto.PayloadCase, SensorEventHandler> sensorEventHandlers;
     private final Map<HubEventProto.PayloadCase, HubEventHandler> hubEventHandlers;
 
-    public EventController(Set<SensorEventHandler> sensorEventHandlerList, Set<HubEventHandler> hubEventHandlerList) {
+    public CollectorController(Set<SensorEventHandler> sensorEventHandlerList, Set<HubEventHandler> hubEventHandlerList) {
         this.sensorEventHandlers = sensorEventHandlerList.stream()
                 .collect(Collectors.toMap(SensorEventHandler::getMessageType, Function.identity()));
         this.hubEventHandlers = hubEventHandlerList.stream()

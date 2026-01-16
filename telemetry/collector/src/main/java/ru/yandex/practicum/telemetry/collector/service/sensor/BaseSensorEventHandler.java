@@ -43,7 +43,7 @@ public abstract class BaseSensorEventHandler<T extends SpecificRecordBase> imple
                 topic,
                 null,
                 eventAvro.getTimestamp().toEpochMilli(),
-                eventAvro.getHubId(),
+                eventAvro.getHubId().toString(),
                 eventAvro);
 
         producer.getProducer().send(record);

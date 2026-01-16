@@ -17,6 +17,7 @@ import ru.yandex.practicum.repository.ActionRepository;
 import ru.yandex.practicum.repository.ConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,13 @@ public class SnapshotHandler {
     }
 
     private Map<String, SensorStateAvro> convertMap(Map<CharSequence, SensorStateAvro> charSequenceMap) {
-        return (Map<String, SensorStateAvro>) (Map<?, ?>) charSequenceMap;
+        Map<String, SensorStateAvro> result = new HashMap<>();
+        if (charSequenceMap != null) {
+            for (Map.Entry<CharSequence, SensorStateAvro> entry : charSequenceMap.entrySet()) {
+                result.put(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        return result;
     }
 
     private Boolean handleScenario(Scenario scenario, Map<String, SensorStateAvro> sensorStateMap) {

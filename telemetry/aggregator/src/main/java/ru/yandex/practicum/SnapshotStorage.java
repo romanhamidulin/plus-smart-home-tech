@@ -37,7 +37,7 @@ public class SnapshotStorage {
         newState.setData(event.getPayload());
         snapshot.getSensorsState().put(event.getId(), newState);
         snapshot.setTimestamp(event.getTimestamp());
-        snapshots.put(event.getHubId(), snapshot);
+        snapshots.put(event.getHubId().toString(), snapshot);
         return Optional.of(snapshot);
     }
 }

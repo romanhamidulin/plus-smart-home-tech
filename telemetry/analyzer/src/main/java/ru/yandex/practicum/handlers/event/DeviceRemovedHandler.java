@@ -19,7 +19,7 @@ public class DeviceRemovedHandler implements HubEventHandler {
     public void handle(HubEventAvro event) {
         DeviceRemovedEventAvro removedEvent = (DeviceRemovedEventAvro) event.getPayload();
         log.info("Удаляем устройство с id = {} из хаба с hub_id = {}", removedEvent.getId(), event.getHubId());
-        repository.deleteByIdAndHubId(removedEvent.getId().toString(), event.getHubId().toString());
+        repository.deleteByIdAndHubId(removedEvent.getId(), event.getHubId());
     }
 
     @Override

@@ -25,9 +25,6 @@ public class KafkaConfig {
     @Value("${kafka.key-deserializer}")
     private String keyDeserializer;
 
-//    @Value("${kafka.snapshot-consumer-properties.value-deserializer}")
-//    private String snapshotValueDeserializer;
-
     @Value("${kafka.hub-consumer-properties.value-deserializer}")
     private String hubValueDeserializer;
 

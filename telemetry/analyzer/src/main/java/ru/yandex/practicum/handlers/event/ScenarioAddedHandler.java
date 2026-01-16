@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
+import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
 import ru.yandex.practicum.model.Action;
 import ru.yandex.practicum.model.Condition;
 import ru.yandex.practicum.model.Scenario;
@@ -14,7 +16,6 @@ import ru.yandex.practicum.repository.ConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
 import ru.yandex.practicum.repository.SensorRepository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,25 +34,25 @@ public class ScenarioAddedHandler implements HubEventHandler {
     public void handle(HubEventAvro event) {
         ScenarioAddedEventAvro scenarioAddedEvent = (ScenarioAddedEventAvro) event.getPayload();
 
-        Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(event.getHubId().toString(),
-                scenarioAddedEvent.getName().toString());
+        Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(event.getHubId(),
+                scenarioAddedEvent.getName());
 
         if (scenarioOpt.isEmpty()) {
             Scenario scenario = scenarioRepository.save(mapToScenario(event));
-            if (checkSensorsInScenarioConditions(scenarioAddedEvent, event.getHubId().toString())) {
+            if (checkSensorsInScenarioConditions(scenarioAddedEvent, event.getHubId())) {
                 conditionRepository.saveAll(mapToCondition(scenarioAddedEvent, scenario));
             }
-            if (checkSensorsInScenarioActions(scenarioAddedEvent, event.getHubId().toString())) {
+            if (checkSensorsInScenarioActions(scenarioAddedEvent, event.getHubId())) {
                 actionRepository.saveAll(mapToAction(scenarioAddedEvent, scenario));
             }
         } else {
             Scenario scenario = scenarioOpt.get();
 
-            if (checkSensorsInScenarioConditions(scenarioAddedEvent, event.getHubId().toString())) {
+            if (checkSensorsInScenarioConditions(scenarioAddedEvent, event.getHubId())) {
                 conditionRepository.saveAll(mapToCondition(scenarioAddedEvent, scenario));
             }
 
-            if (checkSensorsInScenarioActions(scenarioAddedEvent, event.getHubId().toString())) {
+            if (checkSensorsInScenarioActions(scenarioAddedEvent, event.getHubId())) {
                 actionRepository.saveAll(mapToAction(scenarioAddedEvent, scenario));
             }
         }
@@ -66,15 +67,15 @@ public class ScenarioAddedHandler implements HubEventHandler {
         ScenarioAddedEventAvro scenarioAddedEvent = (ScenarioAddedEventAvro) event.getPayload();
 
         return Scenario.builder()
-                .name(scenarioAddedEvent.getName().toString())
-                .hubId(event.getHubId().toString())
+                .name(scenarioAddedEvent.getName())
+                .hubId(event.getHubId())
                 .build();
     }
 
     private Set<Condition> mapToCondition(ScenarioAddedEventAvro scenarioAddedEvent, Scenario scenario) {
         return scenarioAddedEvent.getConditions().stream()
                 .map(c -> Condition.builder()
-                        .sensor(sensorRepository.findById(c.getSensorId().toString()).orElseThrow())
+                        .sensor(sensorRepository.findById(c.getSensorId()).orElseThrow())
                         .scenario(scenario)
                         .type(c.getType())
                         .operation(c.getOperation())
@@ -87,7 +88,7 @@ public class ScenarioAddedHandler implements HubEventHandler {
         log.info("Обрабатываем список действий {}", scenarioAddedEvent.getActions());
         return scenarioAddedEvent.getActions().stream()
                 .map(action -> Action.builder()
-                        .sensor(sensorRepository.findById(action.getSensorId().toString()).orElseThrow())
+                        .sensor(sensorRepository.findById(action.getSensorId()).orElseThrow())
                         .scenario(scenario)
                         .type(action.getType())
                         .value(action.getValue())
@@ -104,18 +105,14 @@ public class ScenarioAddedHandler implements HubEventHandler {
     }
 
     private boolean checkSensorsInScenarioConditions(ScenarioAddedEventAvro scenarioAddedEvent, String hubId) {
-        List<String> sensorIds = scenarioAddedEvent.getConditions().stream()
-                .map(condition -> condition.getSensorId().toString())
-                .toList();
-
-        return sensorRepository.existsByIdInAndHubId(sensorIds, hubId);
+        return sensorRepository.existsByIdInAndHubId(scenarioAddedEvent.getConditions().stream()
+                .map(ScenarioConditionAvro::getSensorId)
+                .toList(), hubId);
     }
 
     private boolean checkSensorsInScenarioActions(ScenarioAddedEventAvro scenarioAddedEvent, String hubId) {
-        List<String> sensorIds = scenarioAddedEvent.getActions().stream()
-                .map(action -> action.getSensorId().toString())
-                .toList();
-
-        return sensorRepository.existsByIdInAndHubId(sensorIds, hubId);
+        return sensorRepository.existsByIdInAndHubId(scenarioAddedEvent.getActions().stream()
+                .map(DeviceActionAvro::getSensorId)
+                .toList(), hubId);
     }
 }

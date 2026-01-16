@@ -31,8 +31,8 @@ public class DeviceAddedHandler implements HubEventHandler {
         DeviceAddedEventAvro deviceAddedEvent = (DeviceAddedEventAvro) event.getPayload();
 
         return Sensor.builder()
-                .id(deviceAddedEvent.getId().toString())
-                .hubId(event.getHubId().toString())
+                .id(deviceAddedEvent.getId())
+                .hubId(event.getHubId())
                 .build();
     }
 }

@@ -42,7 +42,7 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
                 topic,
                 null,
                 eventAvro.getTimestamp().toEpochMilli(),
-                eventAvro.getHubId(),
+                eventAvro.getHubId().toString(),
                 eventAvro);
 
         producer.getProducer().send(record);

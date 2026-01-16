@@ -17,7 +17,6 @@ import ru.yandex.practicum.repository.ActionRepository;
 import ru.yandex.practicum.repository.ConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +31,7 @@ public class SnapshotHandler {
 
     public void handleSnapshot(SensorsSnapshotAvro sensorsSnapshot) {
         log.info("Зашли в метод handleSnapshot");
-        Map<CharSequence, SensorStateAvro> charSequenceMap = sensorsSnapshot.getSensorsState();
-        Map<String, SensorStateAvro> sensorStateMap = convertMap(charSequenceMap);
+        Map<CharSequence, SensorStateAvro> sensorStateMap = sensorsSnapshot.getSensorsState();
         List<Scenario> scenarios = scenarioRepository.findByHubId(sensorsSnapshot.getHubId().toString());
         scenarios.stream()
                 .filter(scenario -> handleScenario(scenario, sensorStateMap))
@@ -43,24 +41,14 @@ public class SnapshotHandler {
                 });
     }
 
-    private Map<String, SensorStateAvro> convertMap(Map<CharSequence, SensorStateAvro> charSequenceMap) {
-        Map<String, SensorStateAvro> result = new HashMap<>();
-        if (charSequenceMap != null) {
-            for (Map.Entry<CharSequence, SensorStateAvro> entry : charSequenceMap.entrySet()) {
-                result.put(entry.getKey().toString(), entry.getValue());
-            }
-        }
-        return result;
-    }
-
-    private Boolean handleScenario(Scenario scenario, Map<String, SensorStateAvro> sensorStateMap) {
+    private Boolean handleScenario(Scenario scenario, Map<CharSequence, SensorStateAvro> sensorStateMap) {
         List<Condition> conditions = conditionRepository.findAllByScenario(scenario);
         log.info("получили список кондиций {} у сценария name = {}", conditions, scenario.getName());
 
         return conditions.stream().noneMatch(condition -> !checkCondition(condition, sensorStateMap));
     }
 
-    private Boolean checkCondition(Condition condition, Map<String, SensorStateAvro> sensorStateMap) {
+    private Boolean checkCondition(Condition condition, Map<CharSequence, SensorStateAvro> sensorStateMap) {
         String sensorId = condition.getSensor().getId();
         SensorStateAvro sensorState = sensorStateMap.get(sensorId);
         if (sensorState == null) {

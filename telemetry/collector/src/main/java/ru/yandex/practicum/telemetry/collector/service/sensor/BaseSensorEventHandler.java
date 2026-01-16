@@ -17,12 +17,12 @@ public abstract class BaseSensorEventHandler<T extends SpecificRecordBase> imple
     @Value("${kafka.topic.sensor}")
     protected String topic;
 
-    protected abstract T mapToAvro(SensorEvent event);
+    protected abstract T mapToAvro(SensorEventProto event);
 
     @Override
-    public void handle(SensorEvent event) {
-        if (!event.getType().equals(getMessageType())) {
-            throw new IllegalArgumentException("Неизвестный тип события: " + event.getType());
+    public void handle(SensorEventProto event) {
+        if (!event.getPayloadCase().equals(getMessageType())) {
+            throw new IllegalArgumentException("Неизвестный тип события: " + event.getPayloadCase());
         }
 
         //преобразование события в Avro запись
@@ -31,14 +31,16 @@ public abstract class BaseSensorEventHandler<T extends SpecificRecordBase> imple
         SensorEventAvro eventAvro = SensorEventAvro.newBuilder()
                 .setHubId(event.getHubId())
                 .setId(event.getId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(Instant.ofEpochSecond(
+                        event.getTimestamp().getSeconds(),
+                        event.getTimestamp().getNanos()))
                 .setPayload(payload)
                 .build();
 
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
                 topic,
                 null,
-                event.getTimestamp().toEpochMilli(),
+                eventAvro.getTimestamp().toEpochMilli(),
                 eventAvro.getHubId(),
                 eventAvro);
 

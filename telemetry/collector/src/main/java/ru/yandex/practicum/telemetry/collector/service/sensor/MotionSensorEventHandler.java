@@ -14,8 +14,8 @@ public class MotionSensorEventHandler extends BaseSensorEventHandler<MotionSenso
     }
 
     @Override
-    protected MotionSensorAvro mapToAvro(SensorEvent event) {
-        MotionSensorEvent motionSensorEvent = (MotionSensorEvent) event;
+    protected MotionSensorAvro mapToAvro(SensorEventProto event) {
+        MotionSensorProto motionSensorEvent = event.getMotionSensorEvent();
         return MotionSensorAvro.newBuilder()
                 .setLinkQuality(motionSensorEvent.getLinkQuality())
                 .setVoltage(motionSensorEvent.getVoltage())
@@ -24,7 +24,7 @@ public class MotionSensorEventHandler extends BaseSensorEventHandler<MotionSenso
     }
 
     @Override
-    public SensorEventType getMessageType() {
-        return SensorEventType.MOTION_SENSOR_EVENT;
+    public SensorEventProto.PayloadCase getMessageType() {
+        return SensorEventProto.PayloadCase.MOTION_SENSOR_EVENT;
     }
 }

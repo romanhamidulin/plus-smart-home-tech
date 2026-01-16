@@ -7,7 +7,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
-import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
+
+import java.time.Instant;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,27 +18,29 @@ public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implemen
     @Value("${kafka.topic.hub}")
     protected String topic;
 
-    protected abstract T mapToAvro(HubEvent event);
+    protected abstract T mapToProto(HubEventProto event);
 
     @Override
-    public void handle(HubEvent event) {
-        if (!event.getType().equals(getMessageType())) {
-            throw new IllegalArgumentException("Неизвестный тип события: " + event.getType());
+    public void handle(HubEventProto event) {
+        if (!event.getPayloadCase().equals(getMessageType())) {
+            throw new IllegalArgumentException("Неизвестный тип события: " + event.getPayloadCase());
         }
 
         //преобразование события в Avro запись
-        T payload = mapToAvro(event);
+        T payload = mapToProto(event);
 
         HubEventAvro eventAvro = HubEventAvro.newBuilder()
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(Instant.ofEpochSecond(
+                        event.getTimestamp().getSeconds(),
+                        event.getTimestamp().getNanos()))
                 .setPayload(payload)
                 .build();
 
         ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
                 topic,
                 null,
-                event.getTimestamp().toEpochMilli(),
+                eventAvro.getTimestamp().toEpochMilli(),
                 eventAvro.getHubId(),
                 eventAvro);
 

@@ -11,14 +11,11 @@ import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
 import ru.yandex.practicum.model.Action;
 import ru.yandex.practicum.model.Condition;
 import ru.yandex.practicum.model.Scenario;
-import ru.yandex.practicum.model.Sensor;
 import ru.yandex.practicum.repository.ActionRepository;
 import ru.yandex.practicum.repository.ConditionRepository;
 import ru.yandex.practicum.repository.ScenarioRepository;
 import ru.yandex.practicum.repository.SensorRepository;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -89,29 +86,13 @@ public class ScenarioAddedHandler implements HubEventHandler {
 
     private Set<Action> mapToAction(ScenarioAddedEventAvro scenarioAddedEvent, Scenario scenario) {
         log.info("Обрабатываем список действий {}", scenarioAddedEvent.getActions());
-
-        List<String> sensorIds = scenarioAddedEvent.getActions().stream()
-                .map(action -> action.getSensorId())
-                .distinct()
-                .collect(Collectors.toList());
-
-        Map<String, Sensor> sensorMap = sensorRepository.findAllById(sensorIds).stream()
-                .collect(Collectors.toMap(Sensor::getId, sensor -> sensor));
-
         return scenarioAddedEvent.getActions().stream()
-                .map(action -> {
-                    Sensor sensor = sensorMap.get(action.getSensorId());
-                    if (sensor == null) {
-                        throw new IllegalArgumentException(
-                                "Сенсор с ID " + action.getSensorId() + " не найден");
-                    }
-                    return Action.builder()
-                            .sensor(sensor)
-                            .scenario(scenario)
-                            .type(action.getType())
-                            .value(action.getValue())
-                            .build();
-                })
+                .map(action -> Action.builder()
+                        .sensor(sensorRepository.findById(action.getSensorId()).orElseThrow())
+                        .scenario(scenario)
+                        .type(action.getType())
+                        .value(action.getValue())
+                        .build())
                 .collect(Collectors.toSet());
     }
 

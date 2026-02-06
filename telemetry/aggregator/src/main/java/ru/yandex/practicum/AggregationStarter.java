@@ -31,6 +31,7 @@ public class AggregationStarter {
 
     public void start() {
         try {
+
             consumer.subscribe(List.of(inputTopic));
             log.info("Подписка на топик {}", inputTopic);
 
@@ -62,25 +63,20 @@ public class AggregationStarter {
             }
 
         } catch (WakeupException ignored) {
-            log.info("Получен WakeupException, начинаем завершение работы");
         } catch (Exception e) {
             log.error("Ошибка во время обработки событий от датчиков", e);
         } finally {
             try {
-                // Даем время на завершение отправки всех сообщений
                 producer.flush();
                 log.info("Все данные отправлены в Kafka");
-
                 consumer.commitSync();
                 log.info("Все смещения зафиксированы");
 
-            } catch (Exception e) {
-                log.error("Ошибка при завершении работы", e);
             } finally {
                 log.info("Закрываем консьюмер");
-                consumer.close(Duration.ofSeconds(10));
+                consumer.close();
                 log.info("Закрываем продюсер");
-                producer.close(Duration.ofSeconds(30));
+                producer.close();
             }
         }
     }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +27,18 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
-        log.debug("Запрашиваем товары с категорией - {} и пагинацией - {}", category, pageable);
-        List<Product> products = productRepository.findAllByProductCategory(category, pageable).getContent();
-        log.debug("Получили из DB список товаров размером {}", products.size());
-        return products.stream()
-                .map(productMapper::toProductDto)
-                .toList();
+    public Page<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
+        log.info("Получение товаров с фильтром по категории: {} и пагинацией: {}", category, pageable);
+
+        Page<Product> productsPage;
+
+        if (category != null) {
+            productsPage = productRepository.findAllByProductCategory(category, pageable);
+        } else {
+            productsPage = productRepository.findAll(pageable);
+        }
+
+        return productsPage.map(productMapper::toProductDto);
     }
 
     @Transactional

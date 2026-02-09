@@ -2,6 +2,8 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,13 +25,24 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
+    public Page<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
         log.debug("Запрашиваем товары с категорией - {} и пагинацией - {}", category, pageable);
-        List<Product> products = productRepository.findAllByProductCategory(category, pageable).getContent();
-        log.debug("Получили из DB список товаров размером {}", products.size());
-        return products.stream()
+
+        Page<Product> productPage;
+        if (category != null) {
+            productPage = productRepository.findAllByProductCategory(category, pageable);
+        } else {
+            productPage = productRepository.findAll(pageable);
+        }
+
+        List<ProductDto> productDtos = productPage.getContent().stream()
                 .map(productMapper::toProductDto)
                 .toList();
+
+        log.debug("Получили из DB страницу товаров: {} из {}, всего {}",
+                productPage.getNumber(), productPage.getTotalPages(), productPage.getTotalElements());
+
+        return new PageImpl<>(productDtos, pageable, productPage.getTotalElements());
     }
 
     @Transactional

@@ -109,9 +109,8 @@ public class WarehouseServiceImpl implements WarehouseService {
             } else {
                 quantityState = QuantityState.ENDED;
             }
-            SetProductQuantityStateRequest stateRequest = new SetProductQuantityStateRequest(product.getProductId(), quantityState);
             log.info("Обновляем количество товара в магазине");
-            shoppingStoreClient.setProductQuantityState(stateRequest);
+            shoppingStoreClient.setProductQuantityState(product.getProductId(), quantityState);
             log.info("Обновили количество товара в магазине");
         } catch (RuntimeException e) {
             log.info("Такого товара нет в магазине");

@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.ShoppingStoreOperations;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.service.ShoppingStoreService;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
@@ -56,9 +58,14 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
     }
 
     @Override
-    public boolean setProductQuantityState(SetProductQuantityStateRequest request) {
-        log.info("PUT /api/v1/shopping-store/quantityState - Обновление количества товара {}: {}", request.getProductId(), request.getQuantityState());
-        boolean response = shoppingStoreService.updateQuantityState(request);
+    public boolean setProductQuantityState(
+            @RequestParam UUID productId,
+            @RequestParam QuantityState quantityState) {
+
+        log.info("PUT /api/v1/shopping-store/quantityState - Обновление количества товара {}: {}",
+                productId, quantityState);
+
+        boolean response = shoppingStoreService.updateQuantityState(productId, quantityState);
         log.info("Обновили количество товаров: {}", response);
         return response;
     }

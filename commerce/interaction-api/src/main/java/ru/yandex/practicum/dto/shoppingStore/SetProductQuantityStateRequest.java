@@ -15,7 +15,4 @@ public class SetProductQuantityStateRequest {
     @NotNull
     private QuantityState quantityState;
 
-    public SetProductQuantityStateRequest() {
-
-    }
 }

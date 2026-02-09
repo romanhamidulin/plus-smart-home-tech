@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
-import ru.yandex.practicum.dto.shoppingStore.ProductDto;
-import ru.yandex.practicum.dto.shoppingStore.ProductState;
-import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
+import ru.yandex.practicum.dto.shoppingStore.*;
 import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
@@ -59,11 +56,10 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Transactional
     @Override
-    public boolean updateQuantityState(SetProductQuantityStateRequest request) {
-        log.debug("Обновляем количество товара в DB - {}", request);
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException("Продукта с id " + request.getProductId() + " не существует"));
-        product.setQuantityState(request.getQuantityState());
+    public boolean updateQuantityState(UUID productId, QuantityState quantityState) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Продукта с id " + productId + " не существует"));
+        product.setQuantityState(quantityState);
         productRepository.save(product);
         log.debug("Обновили количество товара в DB - {}", product);
         return true;

@@ -18,13 +18,14 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
         log.debug("Запрашиваем товары с категорией - {} и пагинацией - {}", category, pageable);
 
@@ -45,7 +46,6 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return new PageImpl<>(productDtos, pageable, productPage.getTotalElements());
     }
 
-    @Transactional
     @Override
     public ProductDto addProduct(ProductDto productDto) {
         log.debug("Сохраняем новый товар в DB - {}", productDto);
@@ -55,7 +55,6 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productMapper.toProductDto(product);
     }
 
-    @Transactional
     @Override
     public ProductDto updateProduct(ProductDto productDto) {
         log.debug("Обновляем товар в DB - {}", productDto);
@@ -67,7 +66,6 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productMapper.toProductDto(product);
     }
 
-    @Transactional
     @Override
     public boolean updateQuantityState(UUID productId, QuantityState quantityState) {
         Product product = productRepository.findById(productId)
@@ -78,7 +76,6 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return true;
     }
 
-    @Transactional
     @Override
     public boolean removeProduct(UUID productId) {
         log.debug("Деактивируем товар в DB c ID - {}", productId);
@@ -90,8 +87,8 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return true;
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public ProductDto getProductById(UUID productId) {
         log.debug("Запрашиваем товар с ID: {}", productId);
         Product product = productRepository.findById(productId)

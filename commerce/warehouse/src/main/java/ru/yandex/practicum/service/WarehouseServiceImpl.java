@@ -98,16 +98,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         ProductDto productDto;
         try {
             productDto = shoppingStoreClient.getProduct(product.getProductId());
-            QuantityState quantityState;
-            if (newQuantity > 100) {
-                quantityState = QuantityState.MANY;
-            } else if (newQuantity > 10) {
-                quantityState = QuantityState.ENOUGH;
-            } else if (newQuantity > 0) {
-                quantityState = QuantityState.FEW;
-            } else {
-                quantityState = QuantityState.ENDED;
-            }
+            QuantityState quantityState = QuantityState.fromQuantity(newQuantity);
             log.info("Обновляем количество товара в магазине");
             shoppingStoreClient.setProductQuantityState(product.getProductId(), quantityState);
             log.info("Обновили количество товара в магазине");

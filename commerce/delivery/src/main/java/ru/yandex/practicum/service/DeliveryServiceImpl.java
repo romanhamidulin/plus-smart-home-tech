@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepository;
@@ -36,7 +37,6 @@ public class DeliveryServiceImpl implements DeliveryService {
     private static final BigDecimal VOLUME_MULTIPLIER = BigDecimal.valueOf(0.2);
     private static final BigDecimal STREET_MULTIPLIER = BigDecimal.valueOf(0.2);
 
-    @Transactional
     @Override
     public DeliveryDto planDelivery(DeliveryDto deliveryDto) {
         log.info("Создаем новую доставку в БД: deliveryDto={}", deliveryDto);
@@ -46,7 +46,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         return deliveryMapper.toDeliveryDto(delivery);
     }
 
-    @Transactional
     @Override
     public BigDecimal deliveryCost(OrderDto orderDto) {
         log.info("Рассчитываем стоимость доставки");
@@ -68,7 +67,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         return totalCost;
     }
 
-    @Transactional
     @Override
     public void deliveryPicked(UUID orderId) {
         log.info("Передаем товар в доставку: orderId={}", orderId);
@@ -82,7 +80,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         log.info("Товар передан в доставку: orderId={}", orderId);
     }
 
-    @Transactional
     @Override
     public void deliverySuccessful(UUID orderId) {
         log.info("Проставить признак успешной доставки товара: orderId={}", orderId);
@@ -95,7 +92,6 @@ public class DeliveryServiceImpl implements DeliveryService {
         log.info("Успешная доставка товара: orderId={}", orderId);
     }
 
-    @Transactional
     @Override
     public void deliveryFailed(UUID orderId) {
         log.info("Проставить признак успешной доставки товара: orderId={}", orderId);

@@ -25,6 +25,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
@@ -78,7 +79,6 @@ public class PaymentServiceImpl implements PaymentService {
         return totalCost;
     }
 
-    @Transactional
     @Override
     public PaymentDto payment(OrderDto orderDto) {
         log.info("Формируем оплату для заказа: orderDto={}", orderDto);

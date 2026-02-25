@@ -37,6 +37,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
@@ -57,7 +58,6 @@ public class OrderServiceImpl implements OrderService {
                 toList();
     }
 
-    @Transactional
     @Override
     public OrderDto createNewOrder(CreateNewOrderRequest request) {
         log.info("Создаем новый заказ: shoppingCartId {}, products {}", request.getShoppingCart().getCartId(), request.getShoppingCart().getProducts());
@@ -103,7 +103,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(newOrder);
     }
 
-    @Transactional
     @Override
     public OrderDto calculateDeliveryCost(UUID orderId) {
         log.info("Обрабатываем вычисление стоимости доставки заказа OrderId: {}", orderId);
@@ -118,7 +117,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToCalculate);
     }
 
-    @Transactional
     @Override
     public OrderDto calculateTotalCost(UUID orderId) {
         log.info("Обрабатываем вычисление общей стоимости заказа OrderId: {}", orderId);
@@ -134,7 +132,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToCalculate);
     }
 
-    @Transactional
     @Override
     public OrderDto payment(UUID orderId) {
         log.info("Обрабатываем успешный платеж по заказу OrderId: {}", orderId);
@@ -147,7 +144,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToPay);
     }
 
-    @Transactional
     @Override
     public OrderDto paymentFailed(UUID orderId) {
         log.info("Обрабатываем ошибку оплаты заказа OrderId: {}", orderId);
@@ -156,7 +152,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToPay);
     }
 
-    @Transactional
     @Override
     public OrderDto assembly(UUID orderId) {
         log.info("Обрабатываем успешную сборку заказа OrderId: {}", orderId);
@@ -165,7 +160,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToAssembly);
     }
 
-    @Transactional
     @Override
     public OrderDto assemblyFailed(UUID orderId) {
         log.info("Обрабатываем ошибку сборки по заказу OrderId: {}", orderId);
@@ -174,7 +168,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToAssembly);
     }
 
-    @Transactional
     @Override
     public OrderDto delivery(UUID orderId) {
         log.info("Обрабатываем успешную доставку по заказу OrderId: {}", orderId);
@@ -183,7 +176,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToDeliver);
     }
 
-    @Transactional
     @Override
     public OrderDto deliveryFailed(UUID orderId) {
         log.info("Обрабатываем ошибку доставки заказа OrderId: {}", orderId);
@@ -192,7 +184,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToDeliver);
     }
 
-    @Transactional
     @Override
     public OrderDto complete(UUID orderId) {
         log.info("Обрабатываем завершение заказа OrderId: {}", orderId);
@@ -201,7 +192,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderDto(orderToComplete);
     }
 
-    @Transactional
     @Override
     public OrderDto productReturn(ProductReturnRequest request) {
         log.info("Создан запрос на возврат заказа OrderId: {}, products: {}", request.getOrderId(), request.getProducts());

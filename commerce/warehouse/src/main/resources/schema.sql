@@ -8,4 +8,17 @@ CREATE TABLE IF NOT EXISTS warehouse.warehouse_products (
     depth DOUBLE PRECISION NOT NULL,
     weight DOUBLE PRECISION NOT NULL,
     quantity BIGINT
+)
+
+CREATE TABLE IF NOT EXISTS warehouse.bookings (
+    booking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID NOT NULL,
+    delivery_id UUID
+);
+
+CREATE TABLE IF NOT EXISTS warehouse.booking_product (
+    booking_id UUID NOT NULL REFERENCES warehouse.bookings(booking_id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES warehouse.products(product_id) ON DELETE CASCADE,
+    quantity BIGINT NOT NULL,
+    PRIMARY KEY(booking_id, product_id)
 );

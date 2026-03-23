@@ -9,6 +9,7 @@ import ru.yandex.practicum.dto.shoppindCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppindCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.DeactivateCartException;
+import ru.yandex.practicum.exception.NoCartException;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
 import ru.yandex.practicum.mapper.CartMapper;
@@ -139,5 +140,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         if(!cart.getActive()) {
             throw new DeactivateCartException("Корзина пользователя " + cart.getUsername() + " не активна");
         }
+    }
+
+    @Override
+    public String getUsernameById(UUID cartId) {
+        ShoppingCart shoppingCart = cartRepository.findByCartId(cartId)
+                .orElseThrow(() -> new NoCartException("Корзина с таким ID не существует: {}" + cartId));
+        return shoppingCart.getUsername();
     }
 }
